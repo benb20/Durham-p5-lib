@@ -60,6 +60,15 @@ var saturn; // pale gold 108728KM
 var uranus; // pale blue 51118KM
 var neptune; // pale blue 49632KM 
 
+
+function Planet(radius) {
+  this.radius = radius;
+  //this.colour = colour;
+
+}
+
+
+
 // light defs
 
 var ambientlight = { col : [0,0,0] };
@@ -82,12 +91,6 @@ var pointlights = [
   r1 : 100,
   r2 : 15,
 };
-
-
-
-// function preload() {
-  // phongshader = loadShader('vert.glsl', 'frag.glsl');
-// }
 
 function setup () {
   
@@ -114,31 +117,27 @@ function setup () {
     rotation: [0.81146751, 0.5188172, 0.127647, -0.2367598],
   };
   
-  console.log(Dw.EasyCam.INFO);
+  console.log(Dw.EasyCam.INFO); //easycam info
   
-  // init camera
-  easycam = new Dw.EasyCam(this._renderer, state1);
+  // initialise camera
+  easycam = new Dw.EasyCam(this._renderer, state1); // easycame is a p5.js library used for easy 3D camera control
+  //https://github.com/diwi/p5.EasyCam review easycam here
   
+
   // set some new state, animated
   easycam.setState(state2, 1500);
   
   easycam.state_reset = state2;
-  easycam.setDefaultInterpolationTime(1000);
+  easycam.setDefaultInterpolationTime(1000); //
 }
 
 
 
 function windowResized() {
-	if(!easycam) return;
+	if(!easycam) return; //easycam has a boolean value?
   resizeCanvas(windowWidth, windowHeight);
   easycam.setViewport([0,0,windowWidth, windowHeight]);
 }
-
-
-// function keyReleased(){
-  // console.log(easycam.state);
-// }
-
 
 
 function draw () {
@@ -156,12 +155,6 @@ function draw () {
   background(0);
   noStroke();
  
-
-  var m4_torus = new p5.Matrix();
-
-  // add pointlights
-  // 2 are place somewhere free in space
-  // 3 are moving along the torus surface
   push();  
   {
     
@@ -173,7 +166,7 @@ function draw () {
     push();  
       rotateX( (ang+1) * PI/2);
       translate(0, ty, 0);
-      addPointLight(phongshader, pointlights, 0);
+      addPointLight(phongshader, pointlights, 0); //instead of this we could implement new pointlight?
     pop();
     
 
@@ -185,45 +178,6 @@ function draw () {
     pop();
     
     
-    // torus transformations + surface-pointlights
-    push();  
-      rotateX(PI/2);
-      translate(0,torus_def.r1,0);
-      
-
-      var rad1 = torus_def.r1;
-      var rad2 = torus_def.r2 + 5; // offset from torus surface
-
-      push();  
-        rotateZ(0 * TWO_PI / 3 + frameCount * 0.01);
-        translate(rad1, 0, 0);
-        rotateY(sin(frameCount * 0.01) * TWO_PI);
-        translate(rad2, 0, 0);
-        addPointLight(phongshader, pointlights, 2);
-      pop();
-      
-      push();  
-        rotateZ(2 * TWO_PI / 3 + frameCount * 0.02);
-        translate(rad1, 0, 0);
-        rotateY(frameCount * 0.04);
-        translate(rad2, 0, 0);
-        addPointLight(phongshader, pointlights, 3);
-
-      pop();
-      
-      push();  
-        rotateZ(+PI/2 + sin(frameCount * 0.01) * 2 * PI/3);
-        translate(rad1, 0, 0);
-        rotateY(frameCount * 0.1);
-        translate(rad2, 0, 0);
-        addPointLight(phongshader, pointlights, 1);
-      pop();
-      
-
-      //Initialises the torus
-      m4_torus.set(this._renderer.uMVMatrix);
-      
-    pop();
   }
   pop();
   
@@ -244,39 +198,7 @@ function draw () {
   box(1000, 1000, 10);
   pop();
 
-
-  
-  // torus
-  //delete this later as well as initialiser line above
-  push();  
-  this._renderer.uMVMatrix.set(m4_torus);
-  setMaterial(phongshader, matWhite);
-  torus(torus_def.r1, torus_def.r2, 100, 25);
-  pop();
-
-  
-
-  // random spheres
-  randomSeed(2);
-  setMaterial(phongshader, matDark);
-  for(var i = 0; i < 20; i++){ //increment var for 20 cases I.e 20 spheres
-    push();
-    var tx = random(-1, 1) * 100;
-    var ty = random(-1, 1) * 100;
-    var tz = random( 0, 2) * 50;
-    var rad = random(5, 15);
-    
-    translate(tx, ty, tz + rad + 5); 
-    sphere(rad);
-    pop();
-  }
-
-
 }
-
-
-
-
 
 
 
@@ -301,7 +223,7 @@ function setAmbientlight(shader, ambientlight){
 var m4_modelview = new p5.Matrix();
 var m3_directions = new p5.Matrix('mat3');
 
-function addDirectlight(shader, directlights, idx){
+function addDirectlight(shader, directlights, idx){ //idx is an index number
   
   // inverse transpose of modelview matrix for transforming directions
   // its probably faster however to transform a startpoint and endpoint
@@ -310,7 +232,7 @@ function addDirectlight(shader, directlights, idx){
   m4_modelview.set(easycam.renderer.uMVMatrix);
   m3_directions.inverseTranspose(m4_modelview);
   
-  var light = directlights[idx];
+  var light = directlights[idx]; //access the array at index idx to provide a certain colour
   
   // normalize direction
   var [x,y,z] = light.dir;
@@ -326,7 +248,7 @@ function addDirectlight(shader, directlights, idx){
 }
 
 
-function addPointLight(shader, pointlights, idx){
+function addPointLight(shader, pointlights, idx){ //initialises a pointlight (idx = index)
   
   var light = pointlights[idx];
   
